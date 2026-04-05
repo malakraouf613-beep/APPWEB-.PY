@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VLE - Calcul des fractions vapeur</title>
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    color: white;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 22px;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: #ccc;
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    transition: 0.3s;
+}
+
+input:focus {
+    background: rgba(255,255,255,0.2);
+    box-shadow: 0 0 8px #00c6ff;
+}
+
+input::placeholder {
+    color: rgba(255,255,255,0.45);
+}
+
+button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,198,255,0.5);
+}
+
+.result {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.3);
+    border-left: 4px solid #00c6ff;
+}
+
+.result p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.error {
+    margin-top: 15px;
+    color: #ff6b6b;
+    font-weight: bold;
+    text-align: center;
+}
+
+.footer {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 11px;
+    color: #aaa;
+}
+
+.hidden {
+    display: none;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Calcul des fractions vapeur</h1>
+    <div class="subtitle">Système Benzène / Toluène - Loi de Raoult</div>
+
+    <form id="vle-form" novalidate>
+        <label for="x1">Fraction molaire liquide x1 (Benzène)</label>
+        <input type="number" step="0.01" id="x1" name="x1" placeholder="Ex: 0.40" required>
+
+        <label for="x2">Fraction molaire liquide x2 (Toluène)</label>
+        <input type="number" step="0.01" id="x2" name="x2" placeholder="Ex: 0.60" required>
+
+        <button type="submit">Calculer</button>
+    </form>
+
+    <div id="erreur" class="error hidden" role="alert"></div>
+
+    <div id="result" class="result hidden">
+        <p>🔹 y1 (Benzène vapeur) = <span id="y1-out"></span></p>
+        <p>🔹 y2 (Toluène vapeur) = <span id="y2-out"></span></p>
+        <p>🔸 Vérification : y1 + y2 = <span id="sum-out"></span></p>
+    </div>
+
+    <div class="footer">
+        Application Thermodynamique - VLE
+    </div>
+
+</div>
+
+<script>
+(function () {
+    var P_SAT_BENZENE = 101.3;
+    var P_SAT_TOLUENE = 40.0;
+
+    var form = document.getElementById("vle-form");
+    var erreurEl = document.getElementById("erreur");
+    var resultEl = document.getElementById("result");
+    var y1Out = document.getElementById("y1-out");
+    var y2Out = document.getElementById("y2-out");
+    var sumOut = document.getElementById("sum-out");
+
+    function round4(n) {
+        return Math.round(n * 10000) / 10000;
+    }
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        erreurEl.classList.add("hidden");
+        resultEl.classList.add("hidden");
+
+        var x1 = parseFloat(document.getElementById("x1").value);
+        var x2 = parseFloat(document.getElementById("x2").value);
+
+        if (isNaN(x1) || isNaN(x2)) {
+            erreurEl.textContent = "Erreur dans les valeurs";
+            erreurEl.classList.remove("hidden");
+            return;
+        }
+
+        if (Math.round((x1 + x2) * 100) / 100 !== 1) {
+            erreurEl.textContent = "x1 + x2 doit être égal à 1";
+            erreurEl.classList.remove("hidden");
+            return;
+        }
+
+        var p1 = P_SAT_BENZENE;
+        var p2 = P_SAT_TOLUENE;
+        var denom = x1 * p1 + x2 * p2;
+        if (denom === 0) {
+            erreurEl.textContent = "Erreur dans les valeurs";
+            erreurEl.classList.remove("hidden");
+            return;
+        }
+
+        var y1 = (x1 * p1) / denom;
+        var y2 = (x2 * p2) / denom;
+
+        y1Out.textContent = String(round4(y1));
+        y2Out.textContent = String(round4(y2));
+        sumOut.textContent = String(round4(y1 + y2));
+        resultEl.classList.remove("hidden");
+    });
+})();
+</script>
+
+</body>
+</html>
