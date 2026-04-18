@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}ThermoVLE{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #F5F0E8;
+  --warm-white: #FAF8F4;
+  --amber: #D4890A;
+  --amber-light: #F0B040;
+  --teal: #2A7D7B;
+  --teal-dark: #1A5C5A;
+  --teal-light: #4AADAA;
+  --copper: #B5622A;
+  --text-dark: #1C1A16;
+  --text-mid: #4A4540;
+  --text-light: #8A8078;
+  --border: #E0D8CC;
+  --shadow: rgba(28,26,22,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text-dark);
+  min-height: 100vh;
+}
+.flash-messages { position:fixed; top:20px; right:20px; z-index:9999; }
+.flash {
+  padding: 14px 20px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 16px var(--shadow);
+  animation: slideIn 0.3s ease;
+  max-width: 320px;
+}
+.flash.error { background: #FEE8E8; border-left: 4px solid #DC2626; color: #991B1B; }
+.flash.success { background: #E8F5F0; border-left: 4px solid var(--teal); color: var(--teal-dark); }
+@keyframes slideIn { from { transform: translateX(30px); opacity:0; } to { transform:translateX(0); opacity:1; } }
+</style>
+{% block extra_style %}{% endblock %}
+</head>
+<body>
+<div class="flash-messages">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="flash {{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+</div>
+{% block content %}{% endblock %}
+<script>
+setTimeout(() => {
+  document.querySelectorAll('.flash').forEach(f => {
+    f.style.transition = '0.4s'; f.style.opacity = '0';
+    setTimeout(() => f.remove(), 400);
+  });
+}, 4000);
+</script>
+{% block extra_script %}{% endblock %}
+</body>
+</html>

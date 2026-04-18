@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Inscription — ThermoVLE{% endblock %}
+{% block extra_style %}
+<style>
+body { background:var(--cream); display:flex; align-items:center; justify-content:center; min-height:100vh; overflow:hidden; }
+.bg-pattern {
+  position:fixed; inset:0; z-index:0;
+  background-image:
+    radial-gradient(circle at 75% 25%, rgba(42,125,123,0.07) 0%, transparent 50%),
+    radial-gradient(circle at 25% 75%, rgba(181,98,42,0.06) 0%, transparent 50%);
+}
+.card {
+  position:relative; z-index:1;
+  background:var(--warm-white); border:1px solid var(--border); border-radius:24px;
+  padding:48px 44px; width:420px;
+  box-shadow:0 20px 60px rgba(28,26,22,0.10);
+  animation: fadeUp 0.5s ease;
+}
+@keyframes fadeUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+.logo { display:flex; align-items:center; gap:12px; margin-bottom:32px; }
+.logo-icon { width:48px; height:48px; background:linear-gradient(135deg,var(--teal),var(--teal-light)); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 4px 12px rgba(42,125,123,0.3); }
+.logo-text h2 { font-family:'Playfair Display',serif; font-size:20px; }
+.logo-text p { font-size:12px; color:var(--text-light); margin-top:2px; }
+h1 { font-family:'Playfair Display',serif; font-size:26px; margin-bottom:6px; }
+.subtitle { font-size:14px; color:var(--text-light); margin-bottom:32px; font-weight:300; }
+.field { margin-bottom:18px; }
+label { display:block; font-size:13px; font-weight:500; color:var(--text-mid); margin-bottom:8px; }
+input[type=email], input[type=password] {
+  width:100%; padding:13px 16px; border:1.5px solid var(--border); border-radius:12px;
+  font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text-dark); background:var(--cream); transition:all 0.2s; outline:none;
+}
+input:focus { border-color:var(--teal); background:white; box-shadow:0 0 0 3px rgba(42,125,123,0.1); }
+.btn-primary { width:100%; padding:14px; background:linear-gradient(135deg,var(--teal-dark),var(--teal)); color:white; border:none; border-radius:12px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:500; cursor:pointer; transition:all 0.2s; margin-top:8px; }
+.btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(42,125,123,0.35); }
+.link-row { text-align:center; font-size:14px; color:var(--text-light); margin-top:20px; }
+.link-row a { color:var(--teal); text-decoration:none; font-weight:500; }
+.hint { font-size:11px; color:var(--text-light); margin-top:4px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="bg-pattern"></div>
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">🌡️</div>
+    <div class="logo-text"><h2>ThermoVLE</h2><p>Créer un compte</p></div>
+  </div>
+  <h1>Inscription</h1>
+  <p class="subtitle">Rejoignez la plateforme thermodynamique</p>
+  <form method="POST" action="/register">
+    <div class="field">
+      <label>Adresse e-mail</label>
+      <input type="email" name="email" placeholder="vous@exemple.com" required>
+    </div>
+    <div class="field">
+      <label>Mot de passe</label>
+      <input type="password" name="password" placeholder="Minimum 6 caractères" required>
+      <p class="hint">Au moins 6 caractères requis</p>
+    </div>
+    <div class="field">
+      <label>Confirmer le mot de passe</label>
+      <input type="password" name="confirm" placeholder="Répétez votre mot de passe" required>
+    </div>
+    <button type="submit" class="btn-primary">Créer mon compte →</button>
+  </form>
+  <div class="link-row">Déjà un compte ? <a href="/login">Se connecter</a></div>
+</div>
+{% endblock %}

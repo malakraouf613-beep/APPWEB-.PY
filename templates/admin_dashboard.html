@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Admin — ThermoVLE{% endblock %}
+{% block extra_style %}
+<style>
+body { background:#F0EDE8; min-height:100vh; }
+.navbar {
+  background:#1C1A16; border-bottom:1px solid #3A3630;
+  padding:0 32px; height:64px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.nav-brand { display:flex; align-items:center; gap:10px; }
+.nav-icon { width:36px; height:36px; background:linear-gradient(135deg,var(--copper),var(--amber)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.nav-title { font-family:'Playfair Display',serif; font-size:18px; color:#F5F0E8; }
+.nav-badge { background:rgba(212,137,10,0.2); color:var(--amber); font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; padding:3px 10px; border-radius:20px; border:1px solid rgba(212,137,10,0.3); }
+.nav-right { display:flex; align-items:center; gap:16px; }
+.nav-user { font-size:13px; color:#6A6058; }
+.nav-user strong { color:#9A9088; }
+.btn-logout { padding:8px 16px; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; text-decoration:none; background:transparent; border:1px solid #3A3630; color:#6A6058; transition:all 0.2s; }
+.btn-logout:hover { border-color:#DC2626; color:#DC2626; }
+.main { max-width:1100px; margin:40px auto; padding:0 24px; }
+.page-title { font-family:'Playfair Display',serif; font-size:28px; color:#1C1A16; margin-bottom:6px; }
+.page-sub { font-size:14px; color:#8A8078; margin-bottom:32px; }
+.stats-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:32px; }
+.stat-card {
+  background:white; border:1px solid #E0D8CC; border-radius:16px;
+  padding:24px; display:flex; align-items:center; gap:16px;
+  box-shadow:0 2px 8px rgba(28,26,22,0.05);
+}
+.stat-icon { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.stat-teal { background:rgba(42,125,123,0.12); }
+.stat-amber { background:rgba(212,137,10,0.12); }
+.stat-copper { background:rgba(181,98,42,0.12); }
+.stat-num { font-family:'Playfair Display',serif; font-size:32px; color:#1C1A16; line-height:1; }
+.stat-label { font-size:13px; color:#8A8078; margin-top:4px; }
+.section { background:white; border:1px solid #E0D8CC; border-radius:20px; padding:28px 32px; margin-bottom:24px; box-shadow:0 2px 8px rgba(28,26,22,0.05); }
+.section-title { font-family:'Playfair Display',serif; font-size:18px; color:#1C1A16; margin-bottom:4px; }
+.section-sub { font-size:13px; color:#8A8078; margin-bottom:20px; }
+table { width:100%; border-collapse:collapse; }
+th { text-align:left; font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#8A8078; padding:10px 12px; border-bottom:2px solid #E0D8CC; }
+td { padding:12px 12px; font-size:13px; color:#4A4540; border-bottom:1px solid #F0EDE8; vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:#FAFAF7; }
+.badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+.badge-active { background:rgba(42,125,123,0.1); color:var(--teal-dark); }
+.badge-ended { background:#F0EDE8; color:#8A8078; }
+.badge-reset { background:rgba(181,98,42,0.1); color:var(--copper); }
+.email-cell { font-weight:500; color:#1C1A16; }
+.duration-cell { font-family:'Playfair Display',serif; font-size:15px; }
+.empty { text-align:center; padding:32px; color:#8A8078; font-size:14px; }
+.time-cell { font-size:12px; color:#8A8078; }
+</style>
+{% endblock %}
+{% block content %}
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-icon">⚙️</div>
+    <span class="nav-title">ThermoVLE</span>
+    <span class="nav-badge">Administrateur</span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-user">Connecté : <strong>{{ admin_email }}</strong></span>
+    <a href="/admin/logout" class="btn-logout">Déconnexion</a>
+  </div>
+</nav>
+
+<div class="main">
+  <h1 class="page-title">Tableau de bord</h1>
+  <p class="page-sub">Supervision des utilisateurs et de leurs activités</p>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon stat-teal">👥</div>
+      <div>
+        <div class="stat-num">{{ total_users }}</div>
+        <div class="stat-label">Utilisateurs inscrits</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-amber">🔐</div>
+      <div>
+        <div class="stat-num">{{ total_sessions }}</div>
+        <div class="stat-label">Sessions complètes</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-copper">🔑</div>
+      <div>
+        <div class="stat-num">{{ total_resets }}</div>
+        <div class="stat-label">Réinitialisations de mot de passe</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Utilisateurs -->
+  <div class="section">
+    <div class="section-title">Utilisateurs inscrits</div>
+    <div class="section-sub">Liste de tous les comptes créés sur la plateforme</div>
+    {% if users %}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Email</th>
+          <th>Date d'inscription</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td style="color:#C0B8B0; font-size:12px;">{{ u[0] }}</td>
+          <td class="email-cell">{{ u[1] }}</td>
+          <td class="time-cell">{{ u[2][:16].replace('T', ' ') if u[2] else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">Aucun utilisateur inscrit pour l'instant.</div>
+    {% endif %}
+  </div>
+
+  <!-- Historique sessions -->
+  <div class="section">
+    <div class="section-title">Historique des sessions</div>
+    <div class="section-sub">Connexions, durées et actions des utilisateurs</div>
+    {% if sessions_data %}
+    <table>
+      <thead>
+        <tr>
+          <th>Utilisateur</th>
+          <th>Connexion</th>
+          <th>Déconnexion</th>
+          <th>Durée</th>
+          <th>Statut</th>
+          <th>Mot de passe</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in sessions_data %}
+        <tr>
+          <td class="email-cell">{{ s[1] }}</td>
+          <td class="time-cell">{{ s[2][:16].replace('T', ' ') if s[2] else '—' }}</td>
+          <td class="time-cell">{{ s[3][:16].replace('T', ' ') if s[3] else '—' }}</td>
+          <td class="duration-cell">
+            {% if s[4] %}
+              {{ "%.1f"|format(s[4]) }} min
+            {% else %}
+              <span style="color:#C0B8B0">En cours</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if s[3] %}
+              <span class="badge badge-ended">✓ Terminée</span>
+            {% else %}
+              <span class="badge badge-active">● Active</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if s[5] %}
+              <span class="badge badge-reset">🔑 Réinitialisé</span>
+            {% else %}
+              <span style="color:#C0B8B0; font-size:12px;">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">Aucune session enregistrée pour l'instant.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,155 +1,216 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<title>VLE - Calcul des fractions vapeur</title>
-
+{% extends "base.html" %}
+{% block title %}Calcul VLE — ThermoVLE{% endblock %}
+{% block extra_style %}
 <style>
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Segoe UI", Tahoma, sans-serif;
+body { background:var(--cream); min-height:100vh; }
+.navbar {
+  position:sticky; top:0; z-index:100;
+  background:var(--warm-white); border-bottom:1px solid var(--border);
+  padding:0 32px; height:64px;
+  display:flex; align-items:center; justify-content:space-between;
+  box-shadow:0 2px 12px rgba(28,26,22,0.06);
 }
-
-body {
-    height: 100vh;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.nav-brand { display:flex; align-items:center; gap:10px; }
+.nav-icon { width:36px; height:36px; background:linear-gradient(135deg,var(--teal),var(--teal-light)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.nav-title { font-family:'Playfair Display',serif; font-size:18px; color:var(--text-dark); }
+.nav-right { display:flex; align-items:center; gap:16px; }
+.nav-user { font-size:13px; color:var(--text-light); }
+.nav-user strong { color:var(--text-mid); }
+.btn-nav { padding:8px 16px; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s; }
+.btn-reset { background:var(--cream); border:1px solid var(--border); color:var(--text-mid); }
+.btn-reset:hover { border-color:var(--teal); color:var(--teal); }
+.btn-logout { background:transparent; border:1px solid var(--border); color:var(--text-light); }
+.btn-logout:hover { background:#FEE8E8; border-color:#DC2626; color:#DC2626; }
+.main {
+  max-width:900px; margin:48px auto; padding:0 24px;
+  display:grid; grid-template-columns:1fr 1fr; gap:28px;
 }
-
-.container {
-    width: 400px;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px);
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    color: white;
+.panel {
+  background:var(--warm-white); border:1px solid var(--border); border-radius:20px;
+  padding:32px; box-shadow:0 4px 20px rgba(28,26,22,0.06);
 }
-
-h1 {
-    text-align: center;
-    margin-bottom: 10px;
-    font-size: 22px;
+.panel-full { grid-column: 1/-1; }
+.panel-header { margin-bottom:28px; }
+.panel-tag { font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--teal); margin-bottom:8px; }
+.panel-title { font-family:'Playfair Display',serif; font-size:22px; color:var(--text-dark); }
+.panel-sub { font-size:13px; color:var(--text-light); margin-top:4px; }
+.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:28px; }
+.info-card {
+  background:var(--cream); border:1px solid var(--border); border-radius:12px; padding:16px;
 }
-
-.subtitle {
-    text-align: center;
-    font-size: 13px;
-    color: #ccc;
-    margin-bottom: 25px;
+.info-label { font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-light); margin-bottom:6px; }
+.info-value { font-size:20px; font-weight:600; color:var(--text-dark); }
+.info-unit { font-size:12px; color:var(--text-light); font-weight:400; }
+.field { margin-bottom:20px; }
+label { display:block; font-size:13px; font-weight:500; color:var(--text-mid); margin-bottom:8px; }
+.input-wrapper { position:relative; }
+input[type=number] {
+  width:100%; padding:13px 48px 13px 16px;
+  border:1.5px solid var(--border); border-radius:12px;
+  font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text-dark);
+  background:var(--cream); transition:all 0.2s; outline:none;
+  -moz-appearance:textfield;
 }
-
-label {
-    display: block;
-    margin-top: 15px;
-    font-size: 14px;
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; }
+input:focus { border-color:var(--teal); background:white; box-shadow:0 0 0 3px rgba(42,125,123,0.1); }
+.input-badge {
+  position:absolute; right:12px; top:50%; transform:translateY(-50%);
+  background:var(--teal); color:white; font-size:10px; font-weight:600;
+  padding:2px 7px; border-radius:6px; letter-spacing:0.04em;
 }
-
-input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    background: rgba(255,255,255,0.1);
-    color: white;
-    transition: 0.3s;
+.field-hint { font-size:11px; color:var(--text-light); margin-top:5px; }
+.btn-calc {
+  width:100%; padding:15px; margin-top:4px;
+  background:linear-gradient(135deg, var(--teal-dark), var(--teal));
+  color:white; border:none; border-radius:12px;
+  font-family:'DM Sans',sans-serif; font-size:15px; font-weight:500;
+  cursor:pointer; transition:all 0.2s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
 }
-
-input:focus {
-    background: rgba(255,255,255,0.2);
-    box-shadow: 0 0 8px #00c6ff;
+.btn-calc:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(42,125,123,0.35); }
+.error-box {
+  background:#FEF3F2; border:1px solid #FECDCA; border-radius:12px;
+  padding:14px 16px; color:#DC2626; font-size:14px; margin-top:16px;
+  display:flex; align-items:center; gap:8px;
 }
-
-button {
-    width: 100%;
-    margin-top: 20px;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(90deg, #00c6ff, #0072ff);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
+.result-panel {
+  background:linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 100%);
+  border-radius:20px; padding:32px; color:white;
+  box-shadow:0 8px 32px rgba(42,125,123,0.3);
 }
-
-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(0,198,255,0.5);
+.result-tag { font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; opacity:0.7; margin-bottom:12px; }
+.result-title { font-family:'Playfair Display',serif; font-size:20px; margin-bottom:24px; }
+.result-row { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.15); }
+.result-row:last-child { border-bottom:none; }
+.result-compound { display:flex; align-items:center; gap:10px; }
+.compound-dot { width:10px; height:10px; border-radius:50%; }
+.dot-benzene { background:var(--amber-light); }
+.dot-toluene { background:#7DDBDA; }
+.result-name { font-size:14px; opacity:0.9; }
+.result-value { font-size:22px; font-weight:600; font-family:'Playfair Display',serif; }
+.result-verify { margin-top:18px; background:rgba(255,255,255,0.12); border-radius:10px; padding:12px 16px; font-size:13px; opacity:0.85; }
+.empty-state { text-align:center; padding:40px 20px; color:var(--text-light); }
+.empty-state .empty-icon { font-size:48px; margin-bottom:16px; opacity:0.5; }
+.empty-state p { font-size:14px; }
+.raoult-box {
+  grid-column:1/-1;
+  background:var(--warm-white); border:1px solid var(--border); border-radius:20px;
+  padding:28px 32px; box-shadow:0 4px 20px rgba(28,26,22,0.06);
 }
-
-.result {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 10px;
-    background: rgba(0,0,0,0.3);
-    border-left: 4px solid #00c6ff;
+.eq-title { font-size:12px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--amber); margin-bottom:16px; }
+.equation {
+  font-family:'Playfair Display',serif; font-size:18px; color:var(--text-dark);
+  padding:16px 20px; background:var(--cream); border-radius:12px; border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;
+  text-align:center; line-height:1.8;
 }
-
-.result p {
-    margin: 5px 0;
-    font-size: 14px;
-}
-
-.error {
-    margin-top: 15px;
-    color: #ff6b6b;
-    font-weight: bold;
-    text-align: center;
-}
-
-.footer {
-    margin-top: 15px;
-    text-align: center;
-    font-size: 11px;
-    color: #aaa;
-}
-
+.eq-desc { font-size:13px; color:var(--text-light); margin-top:12px; line-height:1.6; }
 </style>
+{% endblock %}
+{% block content %}
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-icon">🌡️</div>
+    <span class="nav-title">ThermoVLE</span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-user">Connecté : <strong>{{ user_email }}</strong></span>
+    <a href="/reset-password" class="btn-nav btn-reset">🔑 Changer mot de passe</a>
+    <a href="/logout" class="btn-nav btn-logout">Déconnexion</a>
+  </div>
+</nav>
 
-</head>
+<div class="main">
+  <!-- Calcul -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-tag">Loi de Raoult</div>
+      <div class="panel-title">Calcul des fractions vapeur</div>
+      <div class="panel-sub">Système Benzène / Toluène</div>
+    </div>
 
-<body>
-
-<div class="container">
-
-    <h1>Calcul des fractions vapeur</h1>
-    <div class="subtitle">Système Benzène / Toluène - Loi de Raoult</div>
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-label">P°sat Benzène</div>
+        <div class="info-value">101.3 <span class="info-unit">kPa</span></div>
+      </div>
+      <div class="info-card">
+        <div class="info-label">P°sat Toluène</div>
+        <div class="info-value">40.0 <span class="info-unit">kPa</span></div>
+      </div>
+    </div>
 
     <form method="POST">
-        <label>Fraction molaire liquide x1 (Benzène)</label>
-        <input type="number" step="0.01" name="x1" placeholder="Ex: 0.40" required>
-
-        <label>Fraction molaire liquide x2 (Toluène)</label>
-        <input type="number" step="0.01" name="x2" placeholder="Ex: 0.60" required>
-
-        <button type="submit">Calculer</button>
+      <div class="field">
+        <label>Fraction molaire liquide x₁ (Benzène)</label>
+        <div class="input-wrapper">
+          <input type="number" step="0.01" min="0" max="1" name="x1"
+                 placeholder="Ex : 0.40" required
+                 value="{{ request.form.x1 if request.form.x1 else '' }}">
+          <span class="input-badge">x₁</span>
+        </div>
+        <p class="field-hint">Entre 0 et 1 — x₁ + x₂ doit être = 1</p>
+      </div>
+      <div class="field">
+        <label>Fraction molaire liquide x₂ (Toluène)</label>
+        <div class="input-wrapper">
+          <input type="number" step="0.01" min="0" max="1" name="x2"
+                 placeholder="Ex : 0.60" required
+                 value="{{ request.form.x2 if request.form.x2 else '' }}">
+          <span class="input-badge">x₂</span>
+        </div>
+      </div>
+      <button type="submit" class="btn-calc">
+        <span>⚗️</span> Calculer les fractions vapeur
+      </button>
     </form>
 
     {% if erreur %}
-        <div class="error">{{ erreur }}</div>
+    <div class="error-box">⚠️ {{ erreur }}</div>
     {% endif %}
+  </div>
 
-    {% if y1 is not none %}
-    <div class="result">
-        <p>🔹 y1 (Benzène vapeur) = {{ y1|round(4) }}</p>
-        <p>🔹 y2 (Toluène vapeur) = {{ y2|round(4) }}</p>
-        <p>🔸 Vérification : y1 + y2 = {{ (y1 + y2)|round(4) }}</p>
+  <!-- Résultats -->
+  {% if y1 is not none %}
+  <div class="result-panel">
+    <div class="result-tag">Résultats</div>
+    <div class="result-title">Fractions molaires vapeur</div>
+    <div class="result-row">
+      <div class="result-compound">
+        <span class="compound-dot dot-benzene"></span>
+        <span class="result-name">y₁ — Benzène</span>
+      </div>
+      <span class="result-value">{{ y1|round(4) }}</span>
     </div>
-    {% endif %}
-
-    <div class="footer">
-        Application Thermodynamique - VLE
+    <div class="result-row">
+      <div class="result-compound">
+        <span class="compound-dot dot-toluene"></span>
+        <span class="result-name">y₂ — Toluène</span>
+      </div>
+      <span class="result-value">{{ y2|round(4) }}</span>
     </div>
+    <div class="result-verify">
+      ✓ Vérification : y₁ + y₂ = {{ (y1 + y2)|round(4) }}
+    </div>
+  </div>
+  {% else %}
+  <div class="panel">
+    <div class="empty-state">
+      <div class="empty-icon">📊</div>
+      <p>Les résultats apparaîtront<br>ici après le calcul</p>
+    </div>
+  </div>
+  {% endif %}
 
+  <!-- Rappel théorique -->
+  <div class="raoult-box">
+    <div class="eq-title">Rappel — Loi de Raoult (mélange idéal)</div>
+    <div class="equation">
+      yᵢ = xᵢ · P°ᵢ / Σ(xⱼ · P°ⱼ)
+    </div>
+    <p class="eq-desc">
+      La fraction molaire en phase vapeur <em>yᵢ</em> d'un composant <em>i</em> est égale au produit de sa fraction liquide <em>xᵢ</em> par sa pression de saturation <em>P°ᵢ</em>, divisé par la pression totale du mélange (somme des contributions de chaque composant).
+    </p>
+  </div>
 </div>
-
-</body>
-</html>
+{% endblock %}
